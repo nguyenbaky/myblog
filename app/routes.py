@@ -3,7 +3,7 @@ from app.forms import RegisterForm,LoginForm,PostForm,EditProfileForm
 from flask_login import current_user,login_user,logout_user,login_required
 from werkzeug.urls import url_parse
 from app import app,db,bcrypt
-from app.models import User,Post,load_user
+from app.models import User,Post,load_user,listPost,getUser,getPost
 
 @app.route('/')
 def home():
@@ -19,7 +19,7 @@ def index():
         flash('Your post is now live!')
         return redirect(url_for('index'))    
     page = request.args.get('page', 1, type=int)
-    posts = Post.query.order_by(Post.timestamp.desc()).paginate(page=page, per_page=app.config['POSTS_PER_PAGE'])
+    posts = listPost(page)
     next_url = url_for('index', page=posts.next_num) \
         if posts.has_next else None
     prev_url = url_for('index', page=posts.prev_num) \
@@ -121,8 +121,7 @@ def unfollow(username):
 @login_required
 def explore():
     page = request.args.get('page', 1, type=int)
-    posts = Post.query.order_by(Post.timestamp.desc()).paginate(
-        page, app.config['POSTS_PER_PAGE'], False)
+    posts = listPost(page)
     next_url = url_for('explore', page=posts.next_num) \
         if posts.has_next else None
     prev_url = url_for('explore', page=posts.prev_num) \
@@ -133,6 +132,6 @@ def explore():
 @app.route('/user/<username>')
 @login_required
 def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(user_id = user.id)
+    user = getUser(username)
+    posts = getPost(current_user.id)
     return render_template('user.html', user=user, posts=posts)
