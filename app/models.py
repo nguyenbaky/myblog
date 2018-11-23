@@ -1,5 +1,5 @@
 from flask import current_app
-from app import db,login_manager
+from app import db,login_manager,app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -57,3 +57,13 @@ class Post(db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)        
+
+        
+def listPost(page):
+    return Post.query.order_by(Post.timestamp.desc()).paginate(page=page, per_page=app.config['POSTS_PER_PAGE'])        
+
+def getUser(username):
+    return User.query.filter_by(username=username).first_or_404()
+
+def getPost(user_id):
+    return Post.query.filter_by(user_id=user_id)
