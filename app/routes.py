@@ -3,7 +3,9 @@ from app.forms import RegisterForm,LoginForm,PostForm,EditProfileForm
 from flask_login import current_user,login_user,logout_user,login_required
 from werkzeug.urls import url_parse
 from app import app,db,bcrypt
-from app.models import User,Post,load_user,listPost,getUser,getPost
+from app.models.user import User,load_user,getUser
+from app.models.post import Post,listPost,getPost
+
 
 @app.route('/')
 def home():
